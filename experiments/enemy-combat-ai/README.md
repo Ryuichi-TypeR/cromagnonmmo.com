@@ -77,3 +77,7 @@ python3 experiments/enemy-combat-ai/sensory_kin_test.py
 ## 紫尾の巨獣の追加実験
 
 [巨獣の試験報告](BEHEMOTH_REPORT.md)。依存導入済みの環境で `node experiments/enemy-combat-ai/behemoth_test.mjs` を実行する。これは上記のPython標準ライブラリだけの実験と異なり、Nodeと既存依存のesbuildを使う。本体ソースを変更せず、一時bundleへ実験用の判断フックを追加して比較する。
+
+## マンモスの群れとテイムの仲間関係
+
+[調査・試験報告](MAMMOTH_REPORT.md)。`python3 experiments/enemy-combat-ai/mammoth_herd_test.py` で独立モデル13件を実行する。護衛・援護・追撃打切りと、個体ごとの仲間関係を確認する。本体には未接続。
