@@ -85,3 +85,7 @@ python3 experiments/enemy-combat-ai/sensory_kin_test.py
 ## マンモスの護衛攻撃
 
 [牙・短距離体当たりの試験](MAMMOTH_ATTACK_REPORT.md)。`python3 experiments/enemy-combat-ai/mammoth_attack_test.py` で8テストを実行する。前記の群れモデルを使う独立した点モデルであり、本体の攻撃実装ではない。
+
+## マンモス攻撃と実コードの接続
+
+[接続試験とボス戦の課題](MAMMOTH_COMBAT_REPORT.md)。依存とdistを用意し `node experiments/enemy-combat-ai/mammoth_combat_test.mjs` を実行する。既存の命中・損害関数と騎乗処理を使う16項目。本体の恒久変更ではない。
