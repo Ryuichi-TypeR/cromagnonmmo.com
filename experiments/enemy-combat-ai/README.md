@@ -58,6 +58,7 @@ Q = 0.4×人格 + 0.2×心理 + 0.4×観測状況
 - [学習試験](LEARNING_REPORT.md)
 - [定型発話の試験](DIALOGUE_REPORT.md)
 - [共通記憶の統合試験](INTEGRATED_REPORT.md)
+- [感覚ベクトル・一族の招集とヘイト共有の試験](SENSORY_KIN_REPORT.md)（独立した簡略モデル、18テスト）
 
 対象の鴉には発話を追加しません。発話の実験は、語りかける能力を持つ別の仮想ボスへの参考例です。Pythonの識別子 `crow-boss` は試験用のラベルで、実ゲームでの発話能力を示しません。
 
@@ -68,6 +69,11 @@ python3 experiments/enemy-combat-ai/small_test.py
 python3 experiments/enemy-combat-ai/learning_test.py
 python3 experiments/enemy-combat-ai/dialogue_test.py
 python3 experiments/enemy-combat-ai/integrated_memory_test.py
+python3 experiments/enemy-combat-ai/sensory_kin_test.py
 ```
 
 生成JSONと試験用保存データはこのディレクトリ内に出力され、Git管理から除外されます。ゲーム本体を起動せず、実際のセーブには触れません。
+
+## 紫尾の巨獣の追加実験
+
+[巨獣の試験報告](BEHEMOTH_REPORT.md)。依存導入済みの環境で `node experiments/enemy-combat-ai/behemoth_test.mjs` を実行する。これは上記のPython標準ライブラリだけの実験と異なり、Nodeと既存依存のesbuildを使う。本体ソースを変更せず、一時bundleへ実験用の判断フックを追加して比較する。
