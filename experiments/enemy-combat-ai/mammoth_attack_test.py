@@ -16,7 +16,7 @@ class Defense:
     def start(self, kind, target, now):
         if kind not in ('tusk', 'bump') or self.attack or now < self.ready:
             return False
-        if self.a.rider or not self.a.alive or self.a.child or self.a.target != target.id:
+        if self.a.retreating or self.a.rider or not self.a.alive or self.a.child or self.a.target != target.id:
             return False
         d = distance(self.a, target)
         if d == 0 or d > (1.5 if kind == 'tusk' else 3):
@@ -31,10 +31,10 @@ class Defense:
         s = self.attack
         if s is None:
             # A fleeing enemy never becomes a navigation goal here.
-            if not self.a.rider and distance(self.a,self.protected)>2:
+            if not self.a.retreating and not self.a.rider and distance(self.a,self.protected)>2:
                 step_toward(self.a,self.protected,.1)
             return
-        if self.a.rider or not self.a.alive or target.id != s['target'] or not target.alive:
+        if self.a.retreating or self.a.rider or not self.a.alive or target.id != s['target'] or not target.alive:
             self.attack=None;self.ready=now+.5;return
         if distance(target,self.protected)>4 or distance(self.a,self.protected)>2:
             self.attack=None;self.ready=now+.5;return
@@ -79,6 +79,14 @@ def run(kind, protect_friend=False, flee=False):
 
 
 class AttackTests(unittest.TestCase):
+    def test_retreat_cancels_both_attacks_and_prevents_restart(self):
+        for kind in ('tusk','bump'):
+            a=Mammoth('a',1,target='enemy');e=Mammoth('enemy',2)
+            d=Defense(a,Mammoth('child',0));self.assertTrue(d.start(kind,e,0))
+            a.retreating=True;d.update(.8,e)
+            self.assertEqual(d.hits,[]);self.assertIsNone(d.attack)
+            self.assertFalse(d.start(kind,e,2))
+
     def test_both_attacks_defend_calf_and_companion(self):
         for kind in ('tusk','bump'):
             for friend in (False,True):

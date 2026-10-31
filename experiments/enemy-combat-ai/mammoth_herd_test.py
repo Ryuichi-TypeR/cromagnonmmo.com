@@ -19,6 +19,7 @@ class Mammoth:
     role: str = 'idle'
     target: str | None = None
     guardian: str | None = None
+    retreating: bool = False
 
 
 def distance(a, b):
@@ -39,7 +40,12 @@ def tick(animals, threat, victim, informed, attacked=True):
     Guardian selection is deterministic and is recalculated when availability changes.
     No collision geometry; companions relations are experimental inputs, not game ownership.
     """
-    children = [a for a in animals if a.child and a.alive]
+    # Authoritative simplified death event; persists after the calf is removed.
+    retreating_herds = {a.herd for a in animals if a.retreating or (a.child and not a.alive)}
+    for a in animals:
+        if a.herd in retreating_herds:
+            a.retreating = True
+    children = [a for a in animals if a.child and a.alive and not a.retreating]
     guardians = {}
     for child in children:
         candidates = [a for a in animals if not a.child and a.alive and not a.rider and a.herd == child.herd]
@@ -53,6 +59,14 @@ def tick(animals, threat, victim, informed, attacked=True):
         a.target = None
         if not a.alive:
             a.role = 'dead'
+            continue
+        if a.retreating:
+            a.guardian = None
+            if a.rider:
+                a.role = 'retreat-pending-rider'
+            else:
+                a.role = 'retreat'
+                step_toward(a, Mammoth('refuge', -10, 0))
             continue
         if a.rider:
             a.role = 'rider-control'
@@ -96,6 +110,33 @@ def fixture():
 
 
 class HerdTests(unittest.TestCase):
+    def test_calf_death_latches_herd_retreat(self):
+        herd=fixture();herd[0].alive=False;threat=Mammoth('enemy',20)
+        tick(herd,threat,herd[0],{'mother','ally'})
+        self.assertEqual([a.role for a in herd],['dead','retreat','retreat','idle'])
+        victim=herd.pop(0)
+        for _ in range(40):
+            tick(herd,threat,victim,{'mother','ally'})
+            self.assertTrue(all(a.target is None for a in herd))
+        self.assertEqual([a.x for a in herd[:2]],[-10,-10])
+
+    def test_retreat_overrides_tamed_companion_assistance(self):
+        herd=fixture();herd[0].alive=False
+        for a in herd: a.companions.add('friend')
+        tick(herd,Mammoth('enemy',5),Mammoth('friend',4,herd='human'),{'mother','ally'})
+        self.assertEqual(herd[1].role,'retreat')
+        self.assertEqual(herd[2].role,'retreat')
+
+    def test_retreat_persists_through_riding_and_dismount(self):
+        herd=fixture();herd[0].alive=False;herd[1].rider='rider';before=herd[1].x
+        tick(herd,Mammoth('enemy',5),herd[0],{'mother','ally'})
+        self.assertEqual(herd[1].role,'retreat-pending-rider')
+        self.assertEqual(herd[1].x,before)
+        herd[1].rider=None
+        tick(herd,Mammoth('enemy',5),herd[0],{'mother','ally'})
+        self.assertEqual(herd[1].role,'retreat')
+        self.assertLess(herd[1].x,before)
+
     def test_calf_guard_and_herd_assistance(self):
         herd=fixture(); threat=Mammoth('player',5)
         tick(herd,threat,herd[0],{'mother','ally','other'})
