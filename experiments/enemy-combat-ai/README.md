@@ -81,3 +81,7 @@ python3 experiments/enemy-combat-ai/sensory_kin_test.py
 ## マンモスの群れとテイムの仲間関係
 
 [調査・試験報告](MAMMOTH_REPORT.md)。`python3 experiments/enemy-combat-ai/mammoth_herd_test.py` で独立モデル13件を実行する。護衛・援護・追撃打切りと、個体ごとの仲間関係を確認する。本体には未接続。
+
+## マンモスの護衛攻撃
+
+[牙・短距離体当たりの試験](MAMMOTH_ATTACK_REPORT.md)。`python3 experiments/enemy-combat-ai/mammoth_attack_test.py` で8テストを実行する。前記の群れモデルを使う独立した点モデルであり、本体の攻撃実装ではない。
